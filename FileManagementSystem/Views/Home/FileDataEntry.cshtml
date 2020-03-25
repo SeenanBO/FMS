@@ -1,0 +1,407 @@
+﻿
+@{
+    ViewBag.Title = "File DataEntry";
+    var File = ViewBag.File;
+    int FileId = 0;
+    string FileBarcode = "";
+    var BoxId = ViewBag.BoxId;
+    var WorkOrderId = ViewBag.WorkOrderId;
+    var BoxBarcode = ViewBag.BoxBarcode;
+    var BoxCount = ViewBag.BoxCount;
+    var WorkOrderNumber = ViewBag.WorkOrderNumber;
+    bool? NoFile = ViewBag.NoFile;
+    int FileCount = ViewBag.FileCount;
+
+}
+
+@section styles {
+    <style>
+        .p-t-40 {
+            padding-top: 30px !important;
+        }
+
+        .swal2-title {
+            font-size: 1.275em !important;
+        }
+    </style>
+}
+
+@if (File != null)
+{
+    FileId = File.GetType().GetProperty("Id").GetValue(File);
+    FileBarcode = File.GetType().GetProperty("FileBarcode").GetValue(File);
+
+}
+
+<input type="hidden" id="FileId" value="@FileId">
+<input type="hidden" id="OpenedFileBarcode" value="@FileBarcode">
+<input type="hidden" id="BoxId" value="@BoxId">
+<input type="hidden" id="WorkOrderId" value="@WorkOrderId">
+<input type="hidden" id="WorkOrderNumber" value="@WorkOrderNumber">
+<input type="hidden" id="BoxBarcode" value="@BoxBarcode">
+<input type="hidden" id="BoxCount" value="@BoxCount">
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <label>WorkOrder# :<span style="font-weight:bold;">&nbsp;@WorkOrderNumber</span></label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <label>Box Barcode# :<span style="font-weight:bold;">&nbsp;@BoxBarcode</span></label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <label>Total Files:<span style="font-weight:bold;" class="FileCount">&nbsp;@FileCount</span></label>
+    </div>
+</div>
+
+
+
+@if (File == null && NoFile == true)
+{
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            @if (FileCount > 0)
+            {
+                <h3>No More File </h3>
+            }
+            else
+            {
+                <h3>No File Added</h3>
+            }
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <button class="btn btn-warning btn-lg PrevStep">Previous Step</button>
+            <button class="btn btn-success btn-lg CompleteBtn" tabindex="1">Complete</button>
+        </div>
+    </div>
+}
+else
+{
+
+    if (FileCount > 0)
+    {
+        <div class="row ProgressbarRow">
+            <div class="col-md-12 ">
+
+                <div style="margin:0 auto;width:300px;height: 1.5rem">
+                    <span>Files Added: <b class="BarFileCount"></b></span>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    }
+
+    <div class="row">
+        @if (File != null)
+        {
+            <div class="col-md-3 offset-md-3">
+                <div class="form-group">
+                    <label for="FileBarcode">File Barcode:</label>
+                    @if (File.GetType().GetProperty("IsDataEntry").GetValue(File))
+                    {
+                        if (File.GetType().GetProperty("FileBarcode").GetValue(File) != "")
+                        {
+                            <input type="text" class="form-control" id="FileBarcode" tabindex="1" placeholder="Enter File Barcode#" value="@File.GetType().GetProperty("FileBarcode").GetValue(File)" autofocus>
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="FileBarcode" tabindex="1" placeholder="Enter File Barcode#" autofocus>
+                        }
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control" id="FileBarcode" tabindex="1" placeholder="Enter File Barcode#" autofocus>
+                    }
+
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Description">Description:</label>
+                    @if (File.GetType().GetProperty("IsDataEntry").GetValue(File))
+                    {
+                        if (File.GetType().GetProperty("Description").GetValue(File) != "")
+                        {
+                            <textarea type="text" class="form-control" id="FileDesc" rows="2" tabindex="2" placeholder="Enter Description" required>@File.GetType().GetProperty("Description").GetValue(File)</textarea>
+                        }
+                        else
+                        {
+                            <textarea type="text" class="form-control" id="FileDesc" rows="2" tabindex="2" placeholder="Enter Description" required></textarea>
+                        }
+                    }
+                    else
+                    {
+                        <textarea type="text" class="form-control" id="FileDesc" rows="2" tabindex="2" placeholder="Enter Description" required></textarea>
+                    }
+
+
+                </div>
+
+
+                <div class="form-group">
+                    <label for="AddedDate">Date:</label>
+
+                    @if (File.GetType().GetProperty("IsDataEntry").GetValue(File))
+                    {
+                        if (File.GetType().GetProperty("AddedTime").GetValue(File) != null)
+                        {
+                            <input type="hidden" class="form-control" id="AddedDateCheck" value="@File.GetType().GetProperty("AddedTime").GetValue(File)">
+                            <input type="date" class="form-control" id="AddedDate" tabindex="3">
+                        }
+                        else
+                        {
+                            <input type="date" class="form-control" id="AddedDate" tabindex="3">
+                        }
+                    }
+                    else
+                    {
+                        <input type="date" class="form-control" id="AddedDate" tabindex="3">
+                    }
+
+
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Department">Department:</label>
+                    @if (File.GetType().GetProperty("IsDataEntry").GetValue(File))
+                    {
+                        if (File.GetType().GetProperty("Department").GetValue(File) != "")
+                        {
+                            <input type="text" class="form-control" id="Department" tabindex="4" placeholder="Enter Department" value="@File.GetType().GetProperty("Department").GetValue(File)">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="Department" tabindex="4" placeholder="Enter Department">
+                        }
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control" id="Department" tabindex="4" placeholder="Enter Department">
+                    }
+
+
+                </div>
+
+            </div>
+        }
+        <div class="col-md-5">
+            <div class="ImageWrapper ">
+                @if (File != null)
+                {
+                    if (File.GetType().GetProperty("ImgPath").GetValue(File) != "")
+                    {
+                        <img src="@File.GetType().GetProperty("ImgPath").GetValue(File)" style="width:300px">
+                    }
+                    else
+                    {
+                        <img src="/Content/Images/No_Image_Available.jpg" style="width:300px">
+                    }
+                }
+                else
+                {
+                    <img src="/Content/Images/No_Image_Available.jpg" style="width:300px">
+                }
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <button class="btn btn-warning btn-lg PrevStep">Previous Step</button>
+            <button class="btn btn-primary btn-lg NextFile" tabindex="4">Next File</button>
+
+        </div>
+    </div>
+
+    <br>
+}
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            if (performance.navigation.type == 2) {
+                location.reload(true);
+            }
+
+            if (localStorage.getItem("NextFile") == null) {
+                var FileCounter = 0;
+                localStorage.setItem("NextFile", parseInt(FileCounter));
+            } else {
+                FileCounter = localStorage.getItem("NextFile")
+            }
+
+            if (localStorage.getItem("NextBox") == null) {
+                var BoxCounter = 0;
+                localStorage.setItem("NextBox", parseInt(BoxCounter));
+            } else {
+                BoxCounter = localStorage.getItem("NextBox");
+            }
+
+
+            var Progress = 0;
+            Progress = (parseInt(localStorage.getItem("NextFile")) / parseInt($(".FileCount").text())) * 100;
+            $(".BarFileCount").text(parseInt(localStorage.getItem("NextFile")));
+            if (Progress != 0) {
+                Progress = Progress + "%";
+                $(".progress-bar").css("width", Progress);
+            }
+
+            if ($(document).find("#AddedDateCheck").length > 0) {
+                if ($("#AddedDateCheck").val() != "") {
+                    var AddedDateCheck = $("#AddedDateCheck").val();
+                    AddedDateCheck = AddedDateCheck.split(' ');
+                    AddedDateCheck = AddedDateCheck[0];
+                    AddedDateCheck = AddedDateCheck.split('/');
+                    var month = AddedDateCheck[0];
+                    var day = AddedDateCheck[1];
+                    if (month < 10)
+                        month = "0" + month;
+                    if (day < 10)
+                        day = "0" + day;
+                    var thedate = AddedDateCheck[2]+"-"+month+"-"+day;
+                    $('#AddedDate').val(thedate);
+                }
+            }
+
+            $(document).keydown(function(e){
+                if (e.keyCode === 13) {
+                    if($(document).find(".NextFile").length > 0)
+                        $(".NextFile").trigger("click")
+                    else if ($(document).find(".CompleteBtn").length > 0)
+                         $(".CompleteBtn").trigger("click")
+                 }
+            });
+
+            var Checked = false;
+            $(".NextFile").click(function () {
+                if ($("#FileDesc").val() != "") {
+                    if ($("#FileBarcode").val() == $("#OpenedFileBarcode").val() || Checked == true) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("SaveFileDataEntry","Home")',
+                            data: { FileId: parseInt($("#FileId").val()), FileBarcode: $("#FileBarcode").val(), Description: $("#FileDesc").val(), AddedTime: $("#AddedDate").val(), Department: $("#Department").val() },
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                            },
+                            success: function (data) {
+                                if (data != false) {
+                                    Swal.fire({
+                                        title: 'File Saved!',
+                                        timer: 3000,
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    })
+                                    Checked = false;
+                                    FileCounter = parseInt(localStorage.getItem("NextFile")) + 1;
+                                    localStorage.setItem("NextFile", FileCounter);
+                                    setTimeout(function () {
+                                        location.href = '@Url.Action("FileDataEntry","Home")?Number=' + FileCounter + '&BoxId=' + parseInt($("#BoxId").val()) + '&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&BoxBarcode=' + $("#BoxBarcode").val() + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                                    }, 1000);
+
+                                }
+
+                            }
+                        })
+                    } else {
+                        Checked = true;
+                        $("#FileBarcode").focus();
+                        Swal.fire({
+                            title: 'Does Not Match The Initial Entry!',
+                            icon: 'warning',
+                            timer: 3000,
+                            showCancelButton: false,
+                            showConfirmButton: false
+                        })
+                    }
+                } else {
+                    $("#FileDesc").focus();
+                    $("#FileDesc").css("border", "1px solid red");
+                }
+            })
+
+            $(".CompleteBtn").click(function () {
+                 if (localStorage.getItem("PrevBoxPage") == null) {
+                       var NextBox = parseInt(localStorage.getItem("NextBox")) + 1;
+                    } else
+                         var NextBox = parseInt(localStorage.getItem("NextBox"));
+
+                if ($("#BoxCount").val() > NextBox) {
+                    var NextFileNumber = parseInt(localStorage.getItem("NextFile"));
+                    if (localStorage.getItem("PrevFilePage") == null) {
+                        var PrevFilePagePath = '@Url.Action("FileDataEntry","Home")?Number=' + NextFileNumber + '&BoxId=' + parseInt($("#BoxId").val()) + '&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&BoxBarcode=' + $("#BoxBarcode").val() + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                        localStorage.setItem("PrevFilePage", PrevFilePagePath);
+                    } else
+                        PrevFilePagePath = localStorage.getItem("PrevFilePage");
+
+                    BoxCounter = NextBox;
+                    localStorage.setItem("NextBox", BoxCounter);
+                    localStorage.removeItem("NextFile");
+                    location.href = '@Url.Action("BoxDataEntry","Home")?Number=' + BoxCounter + '&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                } else {
+                    localStorage.clear();
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("CompleteDataEntry","Home")',
+                        data: { WorkOrderId: $("#WorkOrderId").val() },
+                        beforeSend: function () {
+                            $("#cover-spin").show();
+                        },
+                        complete: function () {
+                            setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                        },
+                        success: function (data) {
+                            if (data != false) {
+                                Swal.fire({
+                                    title: 'WorkOrder Completed!',
+                                    timer: 3000,
+                                    showCancelButton: false,
+                                    showConfirmButton: false
+                                })
+                                setTimeout(function () {
+                                    location.href = '@Url.Action("WorkOrderSummary","Home")';
+                                }, 1000);
+
+                            }
+
+                        }
+                    })
+                }
+            })
+
+            $(".PrevStep").click(function () {
+                var NextFileNumber = parseInt(localStorage.getItem("NextFile"));
+                NextFileNumber -= 1;
+                BoxCounter = parseInt(localStorage.getItem("NextBox"));
+                if (NextFileNumber < 0) {
+                    localStorage.removeItem("NextFile");
+                    location.href = '@Url.Action("BoxDataEntry","Home")?Number=' + BoxCounter + '&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                } else {
+                    localStorage.setItem("NextFile", NextFileNumber);
+                    location.href = '@Url.Action("FileDataEntry","Home")?Number=' + NextFileNumber + '&BoxId=' + parseInt($("#BoxId").val()) + '&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&BoxBarcode=' + $("#BoxBarcode").val() + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                }
+            })
+
+        })
+    </script>
+}

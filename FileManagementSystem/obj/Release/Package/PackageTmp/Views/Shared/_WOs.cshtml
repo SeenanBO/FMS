@@ -1,0 +1,102 @@
+﻿@using FileManagementSystem.ViewModels;
+@{
+    int counter = 1;
+    WorkOrderViewModel WoList = ViewData["WoList"] as WorkOrderViewModel;
+}
+
+<table class="table table-striped table-responsive-sm datatable WOs" style="overflow-x:scroll;">
+    <thead>
+        <tr>
+            <th>WorkOrder No</th>
+            <th>Boxes</th>
+            <th>Files</th>
+            <th>Added By</th>
+            <th>Added At</th>
+            <th>Modified By</th>
+            <th>Modified At</th>
+            <th>Image</th>
+            <th>Details</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (WoList != null)
+        {
+            if (WoList.WorkOrderList != null)
+            {
+                if (WoList.WorkOrderList.Count > 0)
+                {
+                    foreach (var Obj in WoList.WorkOrderList)
+                    {
+                        if (counter % 2 == 1)
+                        {
+                            <tr class="odd">
+                                <td>@Obj.WorkOrderNumber</td>
+                                <td>@Obj.BoxCount</td>
+                                <td>@Obj.FileCount</td>
+                                <td>@Obj.AddedBy</td>
+                                <td>@Obj.AddedTime</td>
+                                <td>@Obj.ModifiedBy</td>
+                                <td>@Obj.ModifiedTime</td>
+                                <td>
+                                    <a data-workorderid="@Obj.Id" data-WorkOrderNumber="@Obj.WorkOrderNumber" class="btn btn-warning btnactions btnwoimg" title="View Image" href="javascript:void(0)">WO&nbsp;<i class="fa fa-eye"></i></a>
+                                </td>
+                                @if (Obj.BoxCount > 0)
+                                {
+                                    <td><a data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-success wodetail' title='ShowDetail'><i class='fa fa-search-plus'></i></a></td>
+                                }
+                                else
+                                {
+                                    <td><button class="btn btn-success wodetail" disabled><i class='fa fa-search-plus'></i></button></td>
+                                }
+                                @if (Obj.IsFinished)
+                                {
+                                    <td><button data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-primary btnactions woedit' title='Edit Workorder' disabled><i class='fa fa-edit'></i></button> <button data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-danger btnactions wodelete' title='Delete WorkOrder' href='javascript:void(0)' disabled><i class='fa fa-trash'></i></button></td>
+
+                                }
+                                else
+                                {
+                                    <td><a data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-primary btnactions woedit' title='Edit Workorder'><i class='fa fa-edit'></i></a> <a data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-danger btnactions wodelete' title='Delete WorkOrder' href='javascript:void(0)'><i class='fa fa-trash'></i></a></td>
+                                }
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="even">
+                                <td>@Obj.WorkOrderNumber</td>
+                                <td>@Obj.BoxCount</td>
+                                <td>@Obj.FileCount</td>
+                                <td>@Obj.AddedBy</td>
+                                <td>@Obj.AddedTime</td>
+                                <td>@Obj.ModifiedBy</td>
+                                <td>@Obj.ModifiedTime</td>
+                                <td>
+                                    <a data-workorderid="@Obj.Id" data-WorkOrderNumber="@Obj.WorkOrderNumber" class="btn btn-warning btnactions btnwoimg" title="View Image" href="javascript:void(0)">WO&nbsp;<i class="fa fa-eye"></i></a>
+                                </td>
+                                @if (Obj.BoxCount > 0)
+                                {
+                                    <td><a data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-success wodetail' title='ShowDetail'><i class='fa fa-search-plus'></i></a></td>
+                                }
+                                else
+                                {
+                                    <td><button class="btn btn-success wodetail" disabled><i class='fa fa-search-plus'></i></button></td>
+                                }
+                                @if (Obj.IsFinished)
+                                {
+                                    <td><a data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-primary btnactions woedit' title='Edit Workorder'><i class='fa fa-edit'></i></a> <a data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-danger btnactions wodelete' title='Delete WorkOrder' href='javascript:void(0)'><i class='fa fa-trash'></i></a></td>
+                                }
+                                else
+                                {
+                                    <td><button data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-primary btnactions woedit' title='Edit Workorder' disabled><i class='fa fa-edit'></i></button> <button data-workorderid="@Obj.Id" data-workordernumber="@Obj.WorkOrderNumber" class='btn btn-danger btnactions wodelete' title='Delete WorkOrder' href='javascript:void(0)' disabled><i class='fa fa-trash'></i></button></td>
+                                }
+                            </tr>
+                        }
+                    }
+                }
+            }
+        }
+    </tbody>
+
+</table>
+

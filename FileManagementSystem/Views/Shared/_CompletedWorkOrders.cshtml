@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "WorkOrderSummary";
+    var WoList = ViewBag.CompletedWorkOrders;
+    int counter = 1;
+}
+<div id="allCompletedWorkOrders" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card ">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Completed Work Orders</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="date" name="CFromDate" class="form-control" id="CFromDate">
+                                </div>
+                                <div class="col-md-1 text-center">
+                                    <b style="vertical-align:middle;">To</b>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="date" name="CToDate" class="form-control" id="CToDate">
+                                </div>
+                                <div class="col-md-2 com-xs-12">
+                                    <button type="button" id="CWoDateFilter" class="btn-primary" style="margin-top:4px;width:100%;">Filter</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-responsive-sm datatable CWOSummary" style="overflow-x:scroll;">
+                        <thead>
+                            <tr>
+                                <th class="text-center">WorkOrder No</th>
+                                <th class="text-center">Added At</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="CompletedWorkOrderList">
+                            @if (WoList != null)
+                            {
+
+                                if (WoList.Count > 0)
+                                {
+                                    foreach (var Obj in WoList)
+                                    {
+                                        if (counter % 2 == 1)
+                                        {
+                                            <tr class="odd">
+                                                <td class="text-center">@Obj.WorkOrderNumber</td>
+                                                <td class="text-center">@Obj.AddedTime</td>
+                                                <td class="text-center">Completed</td>
+                                                <td class="text-center"><button data-workorderid="@Obj.Id" onclick="location.href='@Url.Action("WorkOrderDataEntry", "Home", new { WorkOrderId = Obj.Id, WorkOrderNumber = Obj.WorkOrderNumber })'" class='btn btn-success wodetail' title='Show Detail' disabled><i class='fa fa-search-plus'></i></button></td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr class="even">
+                                                <td class="text-center">@Obj.WorkOrderNumber</td>
+                                                <td class="text-center">@Obj.AddedTime</td>
+                                                <td class="text-center">Completed</td>
+                                                <td class="text-center"><button data-workorderid="@Obj.Id" onclick="location.href='@Url.Action("WorkOrderDataEntry", "Home", new { WorkOrderId = Obj.Id, WorkOrderNumber = Obj.WorkOrderNumber })'" class='btn btn-success wodetail' title='Show Detail' disabled><i class='fa fa-search-plus'></i></button></td>
+                                            </tr>
+                                        }
+                                        counter++;
+                                    }
+                                }
+
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,232 @@
+﻿
+@{
+    ViewBag.Title = "Files";
+    var WorkOrderId = ViewBag.WorkOrderId;
+    var WorkOrderNumber = ViewBag.WorkOrderNumber;
+    var BoxId = ViewBag.BoxId;
+    var BoxNumber = ViewBag.BoxNumber;
+    var FileCount = ViewBag.FileCount;
+}
+
+@section styles {
+    <style>
+        .p-t-40 {
+            padding-top: 10px !important;
+        }
+
+        .primaryButtons {
+            padding-top: 100px !important;
+        }
+
+        #finishbox {
+            background: #7abcff;
+            background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            background: -webkit-linear-gradient(top, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 );
+        }
+
+        .addfile {
+            background: #8ae29a;
+            background: -moz-linear-gradient(top, #8ae29a 2%, #6bba70 100%);
+            background: -webkit-linear-gradient(top, #8ae29a 2%,#6bba70 100%);
+            background: linear-gradient(to bottom, #8ae29a 2%,#6bba70 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8ae29a', endColorstr='#6bba70',GradientType=0 );
+        }
+
+        .barcodeReader {
+            background: linear-gradient(to bottom, #bab1ba 5%, #ededed 100%);
+            background-color: #bab1ba;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+    </style>
+}
+
+
+<input type="hidden" id="WorkOrderId" value="@WorkOrderId">
+<input type="hidden" id="WorkOrderNumber" value="@WorkOrderNumber">
+<input type="hidden" id="BoxId" value="@BoxId">
+<input type="hidden" id="BoxNumber" value="@BoxNumber">
+<div class="afterShowPrev" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <button  style="border:1px solid #ffc107;margin: 10px 0px 10px 0px;font-weight:bold;font-size:16px;padding:10px;" type="button" class="addfile btn btn-success btn-block">Add Files</button>
+        </div>
+    </div>
+</div>
+
+<div class="primaryButtons">
+    <div class="row">
+        <div class="col-md-12">
+            <button id="finishbox" style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:18px;border:3px solid #ffc107;" type="button" class="btn btn-primary btn-lg btn-block">Finish Box</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button  style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:18px;border:3px solid #ffc107;" type="button" class="addfile btn btn-success btn-lg btn-block">Add Files</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <label style="font-weight:bold;">Files: @FileCount</label>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add File</h4>
+                <button class="close FileClose" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="" method="post">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input class="form-control" id="file-Boxno" type="text" placeholder="Box Barcode" disabled="disabled" value="@BoxNumber">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-th-large"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input class="form-control" id="file-Barcode" type="text" placeholder="File Barcode" autofocus>
+                                <div class="input-group-append">
+                                    <button href="javascript:;" type="button" class="input-group-text barcodeReader">
+                                        <i class="fa fa-barcode"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                Take Pictures: <input type="file" id="addFileImage" name="FileImage" data-fileimage="" multiple>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning FileClose" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-success FileAdded" type="button" >Add</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            if (performance.navigation.type == 2) {
+                location.reload(true);
+            }
+
+        })
+
+        $(".addfile").click(function () {
+            $('#fileModal').modal({
+    		    backdrop: 'static',
+    		    keyboard: false
+		    });
+            $("#file-Barcode").val("");
+            $("#file-Barcode").focus();
+        })
+
+
+        $("#finishbox").click(function () {
+              location.href = '@Url.Action("Boxes", "Home")?WorkOrderId='+$("#WorkOrderId").val()+'&WorkOrderNumber='+$("#WorkOrderNumber").val();
+        })
+
+        
+        $(".FileClose").click(function () {
+            location.reload(false);
+        })
+
+        
+        $("#addFileImage").change(function () {
+            var fileUpload = $("#addFileImage").get(0);
+            var files = fileUpload.files;
+            var fileData = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+            fileData.append('FileImage', 'FileImg');
+            $(this).data("fileimage", fileData);
+        })
+
+
+        $(".FileAdded").click(function () {
+
+            var fileImage = $("#addFileImage").data("fileimage");
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("AddFile","Home")',
+                data: {
+                    BoxId: $("#BoxId").val(), FileNumber: $("#file-Barcode").val()
+                },
+                success: function (data) {
+                    if (data == false) {
+                        Swal.fire({
+                            title: 'File Already Exist!',
+                            text: "There is already an entry against this File Barcode #"+$("#file-Barcode").val(),
+                            icon: 'warning',
+                            timer: 3000,
+                            showCancelButton: false,
+                            showConfirmButton: false                                     
+                        })
+                    }else {
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AddFileImage","Home")',
+                            processData: false,
+                            contentType: false,
+                            data: fileImage,
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                            },
+                            success: function (data) {
+                                if (data != false) {
+                                    swal({
+                                        title: 'File Added!',
+                                        text: 'Against Box Barcode #' + $("#BoxNumber").val(),
+                                        timer: 2000,
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    })
+                                    $("#file-Barcode").val("");
+                                    $("#file-Barcode").focus();
+                                    $("#addFileImage").val("");
+                                } 
+                            }
+                        })
+
+                    }
+
+                }
+            })
+        })
+
+    </script>
+}

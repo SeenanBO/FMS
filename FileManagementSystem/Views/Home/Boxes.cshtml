@@ -1,0 +1,374 @@
+﻿@{
+    ViewBag.Title = "Work Order";
+    var WorkOrderId = ViewBag.WorkOrderId;
+    var WorkOrderNumber = ViewBag.WorkOrderNumber;
+    var BoxCount = ViewBag.BoxCount;
+    var FileCount = ViewBag.FileCount;
+}
+@section styles {
+    <style>
+        .p-t-40 {
+            padding-top: 10px !important;
+        }
+
+        .primaryButtons {
+            padding-top: 100px !important;
+        }
+
+
+        .btnactions {
+            padding: 0.175rem .25rem;
+        }
+
+        #finishwo {
+            background: #7abcff;
+            background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            background: -webkit-linear-gradient(top, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 );
+        }
+
+        .addbox {
+            background: #8ae29a;
+            background: -moz-linear-gradient(top, #8ae29a 2%, #6bba70 100%);
+            background: -webkit-linear-gradient(top, #8ae29a 2%,#6bba70 100%);
+            background: linear-gradient(to bottom, #8ae29a 2%,#6bba70 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8ae29a', endColorstr='#6bba70',GradientType=0 );
+        }
+
+        .barcodeReader {
+            background: linear-gradient(to bottom, #bab1ba 5%, #ededed 100%);
+            background-color: #bab1ba;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+
+        .table td {
+            padding: .25rem;
+            vertical-align: middle;
+            border-top: 1px solid #c8ced3;
+        }
+
+        .modal {
+            overflow-y: auto;
+        }
+    </style>
+}
+
+<input type="hidden" id="WorkOrderId" value="@WorkOrderId">
+<input type="hidden" id="WorkOrderNumber" value="@WorkOrderNumber">
+
+<div class="afterShowPrev" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <button data-toggle="modal" data-target="#boxModal" style="border:1px solid white;margin:10px 0px 10px 0px;font-weight:bold;font-size:16px;padding:10px;" type="button" class="addbox btn btn-success btn-block">Add Box</button>
+        </div>
+    </div>
+</div>
+
+<div class="primaryButtons">
+    <div class="row">
+        <div class="col-md-12">
+            <button id="finishwo" style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:20px;border:3px solid white;" type="button" class="btn btn-primary btn-lg btn-block">Finish Work Orders</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button data-toggle="modal" data-target="#boxModal" style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:20px;border:3px solid white;" type="button" class="addbox btn btn-success btn-lg btn-block">Add Box</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <label style="font-weight:bold;">Boxes: <span class="CurrentBoxCount">@BoxCount</span></label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <label style="font-weight:bold;">Files: @FileCount</label>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="boxModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Box</h4>
+                <button class="close closeModal" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="" method="post">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div id="sourceSelectPanel" style="display:none">
+                                <label for="sourceSelect">Select Camera:</label>
+                                <select id="sourceSelect" style="max-width:400px"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input class="form-control" id="box-Barcode" type="text" placeholder="Box Barcode" autofocus>
+                                <div class="input-group-append">
+                                    <button id="startButton" href="javascript:void(0)" type="button" class="input-group-text barcodeReader">
+                                        <i class="fa fa-barcode"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                Take Picture: &nbsp; <input type="file" id="addBoxImage" name="BoxImage" data-boximage="">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning closeModal" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-success BoxAdded" type="button">Add</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<div class="modal fade" id="BRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Barcode Scan</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="" method="post">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div>
+                                <video id="video" width="300" height="200" style="border: 1px solid gray"></video>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            if (performance.navigation.type == 2) {
+                location.reload(true);
+            }
+
+            if (parseInt($(".CurrentBoxCount").text()) > 0) 
+                $("#finishwo").prop('disabled', false)
+            else
+                $("#finishwo").prop('disabled', true)
+
+        })
+
+        $(".closeModal").click(function () {
+            if (parseInt($(".CurrentBoxCount").text()) > 0) 
+                $("#finishwo").prop('disabled', false)
+            else
+                $("#finishwo").prop('disabled', true)
+        })
+        
+
+        $("#finishwo").click(function () {
+            var workorderid = parseInt($("#WorkOrderId").val());
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("FinishWorkOrder","Home")',
+                data: { WorkOrderId: workorderid },
+                 beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                    },
+                success: function (data) {
+                    if (data != false)
+                        location.href = '@Url.Action("WorkOrders","Home")';
+                    else
+                        alert("Something Went Wrong!")
+
+                }
+            })
+
+        })
+
+        $(".addbox").click(function () {
+            $("#box-Barcode").val("");
+            $("#box-Barcode").focus();
+            $("#addBoxImage").val("");
+        })
+
+        $("#addBoxImage").change(function () {
+            var fileUpload = $("#addBoxImage").get(0);
+            var files = fileUpload.files;
+            var fileData = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+            fileData.append('BoxImage', 'BoxImg');
+            $(this).data("boximage", fileData);
+        })
+
+        $(".BoxAdded").click(function () {
+            if ($("#box-Barcode").val() != "") {
+                var Data = {
+                    WorkOrderId: parseInt($("#WorkOrderId").val()),
+                    WorkOrderNumber: $("#WorkOrderNumber").val(),
+                    BoxNumber: $("#box-Barcode").val()
+                };
+                var boxImage = $("#addBoxImage").data("boximage");
+                if (boxImage != "") {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("AddBox","Home")',
+                        data: Data,
+                        beforeSend: function () {
+                            $("#cover-spin").show();
+                        },
+                        complete: function () {
+                            setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                        },
+                        success: function (data) {
+                            if (data == false) {
+                                $("#box-Barcode").focus();
+                                $("#addBoxImage").val("");
+                                Swal.fire({
+                                    title: 'Box Already Exist!',
+                                    text: "There is already an entry against this Box Barcode#" + $("#box-Barcode").val(),
+                                    icon: 'warning',
+                                    timer: 3000,
+                                    showCancelButton: false,
+                                    showConfirmButton: false
+                                })
+
+                            } else {
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("AddBoxImage","Home")',
+                                    processData: false,
+                                    contentType: false,
+                                    data: boxImage,
+                                    beforeSend: function () {
+                                        $("#cover-spin").show();
+                                    },
+                                    complete: function () {
+                                        setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                                    },
+                                    success: function (data) {
+                                        if (data != false) {
+                                            swal({
+                                                title: 'Box Added!',
+                                                timer: 3000,
+                                                showCancelButton: false,
+                                                showConfirmButton: false
+                                            })
+                                            setTimeout(function () {
+                                                location.href = '@Url.Action("Files", "Home")?WorkOrderId=' + $("#WorkOrderId").val() + '&WorkOrderNumber=' + $("#WorkOrderNumber").val() + "&BoxId=" + data.BoxId + "&BoxNumber=" + data.BoxNumber;
+                                            }, 1000);
+
+                                        }
+                                    }
+                                })
+
+                            }
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'No Image Added!',
+                        text: "Please Add an Image",
+                        icon: 'warning',
+                        timer: 3000,
+                        showCancelButton: false,
+                        showConfirmButton: false
+                    })
+                }
+
+            } else {
+                $("#box-Barcode").css("border", "1px solid red");
+                $("#box-Barcode").focus();
+            }
+        })
+
+    </script>
+
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            let selectedDeviceId;
+            const codeReader = new BRReader.BrowserMultiFormatReader()
+            console.log('BRReader code reader initialized')
+            codeReader.getVideoInputDevices()
+                .then((videoInputDevices) => {
+                    const sourceSelect = document.getElementById('sourceSelect')
+                    selectedDeviceId = videoInputDevices[0].deviceId
+                    if (videoInputDevices.length >= 1) {                        
+                        videoInputDevices.forEach((element) => {
+                            const sourceOption = document.createElement('option')
+                            sourceOption.text = element.label
+                            sourceOption.value = element.deviceId
+                            sourceSelect.appendChild(sourceOption)
+                            sourceSelect.value = element.deviceId
+                            selectedDeviceId = element.deviceId
+                        })
+                        sourceSelect.onchange = () => {
+                            selectedDeviceId = sourceSelect.value;
+                        };
+
+                        const sourceSelectPanel = document.getElementById('sourceSelectPanel')
+                        sourceSelectPanel.style.display = 'block'
+                    }
+
+                    document.getElementById('startButton').addEventListener('click', () => {
+                        $('#BRModal').modal('toggle');
+                        codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                            if (result) {
+                                $('#box-Barcode').val(result);
+                                $('#BRModal').modal('toggle');
+                                codeReader.reset();
+                            }
+                            if (err && !(err instanceof BRReader.NotFoundException)) {
+                                alert(err);
+                                $('#BRModal').modal('toggle');
+                            }
+                        })
+                        console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+                    });
+
+                    $('#BRModal').on('hidden.bs.modal', function () {
+                        codeReader.reset()
+                    })
+
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        });
+
+    </script>
+}

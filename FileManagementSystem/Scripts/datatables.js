@@ -1,0 +1,1 @@
+$('.datatable').DataTable({ "language": {"emptyTable": "No Record Found"}}); $('.datatable').attr('style', 'border-collapse: collapse !important');

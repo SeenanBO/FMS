@@ -1,0 +1,199 @@
+﻿
+@{
+    ViewBag.Title = "Box DataEntry";
+    var Box = ViewBag.Box;
+    var BoxDetail = ViewBag.Files;
+    int WorkOrderId = ViewBag.WorkOrderId;
+    string WorkOrderNumber = ViewBag.WorkOrderNumber;
+    int BoxCount = ViewBag.BoxCount;
+    string BoxBarcode = "";
+    if (Box != null)
+    {
+        BoxBarcode = Box.GetType().GetProperty("BoxBarcode").GetValue(Box);
+    }
+}
+
+@section styles {
+    <style>
+        .p-t-40 {
+            padding-top: 30px !important;
+        }
+
+        .table td {
+            padding: .45rem;
+            vertical-align: middle;
+            border-top: 1px solid #c8ced3;
+        }
+
+        .swal2-title {
+            font-size: 1.275em !important;
+        }
+    </style>
+}
+
+<input type="hidden" id="WorkOrderId" value="@WorkOrderId">
+<input type="hidden" id="WorkOrderNumber" value="@WorkOrderNumber">
+<input type="hidden" id="OpenedBoxBarcode" value="@BoxBarcode">
+@if (Box != null)
+{
+    if (Box.GetType().GetProperty("Id").GetValue(Box) != 0)
+    {
+        <input type="hidden" class="BoxId" value="@Box.GetType().GetProperty("Id").GetValue(Box)">
+    }
+}
+
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <label>Check WorkOrder# :<span style="font-weight:bold;">&nbsp;@WorkOrderNumber</span></label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <label>Total Boxes:<span style="font-weight:bold;">&nbsp;@BoxCount</span></label>
+    </div>
+</div>
+
+<br>
+
+<div class="row">
+    @if (Box != null)
+    {
+        <div class="col-md-3 offset-md-3">
+            <div class="form-group">
+                <label for="usr">Box Barcode:</label>
+                @if (Box.GetType().GetProperty("IsDataEntry").GetValue(Box))
+                {
+                    if (Box.GetType().GetProperty("BoxBarcode").GetValue(Box) != "")
+                    {
+                        <input type="text" class="form-control" id="BoxBarcode" tabindex="1" placeholder="Enter Box Barcode#" value="@Box.GetType().GetProperty("BoxBarcode").GetValue(Box)" autofocus>
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control" id="BoxBarcode" tabindex="1" placeholder="Enter Box Barcode#" autofocus>
+                    }
+                }
+                else
+                {
+                    <input type="text" class="form-control" id="BoxBarcode" tabindex="1" placeholder="Enter Box Barcode#" autofocus>
+                }
+
+
+            </div>
+        </div>
+    }
+    <div class="col-md-5">
+        <div class="ImageWrapper">
+            @if (Box != null)
+            {
+                if (Box.GetType().GetProperty("ImgPath").GetValue(Box) != "")
+                {
+                    <img src="@Box.GetType().GetProperty("ImgPath").GetValue(Box)" style="width:300px">
+                }
+                else
+                {
+                    <img src="/Content/Images/No_Image_Available.jpg" style="width:300px">
+                }
+            }
+            else
+            {
+                <img src="/Content/Images/No_Image_Available.jpg" style="width:300px">
+            }
+        </div>
+    </div>
+</div>
+
+<br>
+<br>
+
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <button class="btn btn-warning btn-lg PrevStep">Previous Step</button>
+        <button class="btn btn-primary btn-lg SaveBox" tabindex="2">Next Step</button>
+    </div>
+</div>
+<br>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            if (performance.navigation.type == 2) {
+                location.reload(true);
+            }
+
+             $(document).keydown(function(e){
+                if (e.keyCode === 13) {
+                        $(".SaveBox").trigger("click")
+                 }
+             });
+
+            var Checked = false;
+            $(".SaveBox").click(function () {
+                if ($("#BoxBarcode").val() != "") {
+                    if ($("#BoxBarcode").val() == $("#OpenedBoxBarcode").val() ||  Checked == true) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("SaveBoxDataEntry","Home")',
+                            data: { BoxId: parseInt($(".BoxId").val()), BoxBarcode: $("#BoxBarcode").val() },
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                            },
+                            success: function (data) {
+                                if (data != false) {
+                                    Swal.fire({
+                                        title: 'Box Saved!',
+                                        timer: 3000,
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    })
+                                    Checked = false;
+                                    localStorage.removeItem("PrevBoxPage");
+                                    setTimeout(function () {
+                                        location.href = '@Url.Action("FileDataEntry","Home")?Number=0&BoxId=' + parseInt($(".BoxId").val()) + '&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&BoxBarcode=' + $("#BoxBarcode").val() + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                                    }, 1000);
+                                }
+                            }
+                        })
+                    } else {
+                        Checked = true;
+                        $("#BoxBarcode").focus();
+                        Swal.fire({
+                            title: 'Does Not Match The Initial Entry!',
+                            icon: 'warning',
+                            timer: 3000,
+                            showCancelButton: false,
+                            showConfirmButton: false
+                        })
+                    }
+                }else {
+                    $("#BoxBarcode").focus();
+                    $("#BoxBarcode").css("border", "1px solid red");
+                }
+
+            })
+
+            $(".PrevStep").click(function () {
+                var PrevFilePagePath = localStorage.getItem("PrevFilePage");
+                if (PrevFilePagePath == null) {
+                    localStorage.removeItem("PrevBoxPage");
+                    location.href = '@Url.Action("WorkOrderDataEntry","Home")?WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                } else {
+                if (localStorage.getItem("PrevBoxPage") == null) {
+                    localStorage.setItem("PrevBoxPage", true);
+                } else
+                    PrevFilePagePath = localStorage.getItem("PrevFilePage");
+                    location.href = PrevFilePagePath;
+
+                }
+            })
+
+    })
+    </script>
+}

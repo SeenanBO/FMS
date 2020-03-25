@@ -1,0 +1,79 @@
+﻿@using FileManagementSystem.ViewModels;
+@{
+    int counter = 1;
+    BoxesViewModel WoDetail = ViewData["BoxList"] as BoxesViewModel;
+}
+
+
+<table class="table table-striped table-responsive-sm datatable wodetailDatatable" style="overflow-x:scroll;">
+    <thead>
+        <tr>
+            <th>Box BarCode</th>
+            <th>Files</th>
+            <th>Added By</th>
+            <th>Added At</th>
+            <th>Modified By</th>
+            <th>Modified At</th>
+            <th>Image</th>
+            <th>Detail</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (WoDetail != null)
+        {
+            if (WoDetail.BoxesList != null)
+            {
+                if (WoDetail.BoxesList.Count > 0)
+                {
+                    foreach (var obj in WoDetail.BoxesList)
+                    {
+                        if (counter % 2 == 1)
+                        {
+                            <tr class="odd">
+                                <td>  @obj.BoxBarcode  </td>
+                                <td>  @obj.FileCount  </td>
+                                <td>  @obj.AddedBy  </td>
+                                <td>  @obj.AddedTime  </td>
+                                <td>  @obj.ModifiedBy  </td>
+                                <td>  @obj.ModifiedTime  </td>
+                                <td>
+                                    <a data-boxid="@obj.Id" data-BoxBarcode="@obj.BoxBarcode" class="btn btn-warning btnactions btnboximg" title="View Image" href="javascript:void(0)">Box&nbsp;<i class="fa fa-eye"></i></a>
+                                </td>
+                                <td>
+                                    <a data-boxid="@obj.Id" data-BoxBarcode="@obj.BoxBarcode" class="btn btn-success  boxdetail" title="View Detail" href="javascript:void(0)"><i class="fa fa-search-plus"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a data-boxid="@obj.Id" data-BoxBarcode="@obj.BoxBarcode" class="btn btn-danger btnactions boxdelete" title="Delete Box" href="javascript:void(0)"><i class="fa fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="even">
+                                <td>  @obj.BoxBarcode  </td>
+                                <td>  @obj.FileCount  </td>
+                                <td>  @obj.AddedBy  </td>
+                                <td>  @obj.AddedTime  </td>
+                                <td>  @obj.ModifiedBy  </td>
+                                <td>  @obj.ModifiedTime  </td>
+                                <td>
+                                    <a data-boxid="@obj.Id" data-BoxBarcode="@obj.BoxBarcode" class="btn btn-warning btnactions btnboximg" title="View Image" href="javascript:void(0)">Box&nbsp;<i class="fa fa-eye"></i></a>
+                                </td>
+                                <td>
+                                    <a data-boxid="@obj.Id" data-BoxBarcode="@obj.BoxBarcode" class="btn btn-success  boxdetail" title="View Detail" href="javascript:void(0)"><i class="fa fa-search-plus"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a data-boxid="@obj.Id" data-BoxBarcode="@obj.BoxBarcode" class="btn btn-danger btnactions boxdelete" title="Delete Box" href="javascript:void(0)"><i class="fa fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                        counter++;
+                    }
+                }
+
+            }
+        }
+    </tbody>
+</table>
+

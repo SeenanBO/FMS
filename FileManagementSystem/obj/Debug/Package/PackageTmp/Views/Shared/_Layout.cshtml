@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title - File Management System</title>
+    @Styles.Render("~/bundles/styles")
+    @RenderSection("styles", required: false)
+</head>
+<body class="app header-fixed sidebar-fixed aside-menu-fixed">
+    <div id="cover-spin">
+        <div class="loader">Loading...</div>
+    </div>
+
+    <header class="app-header navbar">
+        <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="@Url.Action("WorkOrders", "Home")">
+            <img class="navbar-brand-full" src="~/Content/Images/logo_backoffice.png" height="45">
+            <img class="navbar-brand-minimized" src="~/Content/Images/logo_backoffice.png" height="45">
+        </a>
+        @*<button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
+            <span class="navbar-toggler-icon"></span>
+        </button>*@
+        <ul class="nav navbar-nav ml-auto">
+            @Html.Partial("_LoginPartial")
+        </ul>
+    </header>
+
+    <div class="app-body">
+        @*<div class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("WorkOrders", "Home")">
+                            <i class="fa fa-book"></i> WorkOrders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Boxes", "Home")">
+                            <i class="fa fa-list"></i> Boxes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Files", "Home")">
+                            <i class="fa fa-file"></i> Files
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+        </div>*@
+        <main class="main">
+            <div class="container-fluid">
+                <div id="ui-view" class="p-t-40">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="app-footer">
+        <div class="w-100">
+            <div class="mr-3 mt-2 float-right">
+                <a href="https://www.backofficeme.com/">Backoffice FZ LLC</a>
+                <span>© @DateTime.Now.Year </span>
+            </div>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/scripts")
+    @Scripts.Render("~/bundles/scriptsval")
+    @RenderSection("scripts", required: false)
+    <script type="text/javascript">
+        $(".form-horizontal").submit(function (e) {
+            $("#cover-spin").show();
+        });
+        $(document).ready(function () {
+            $('.datatable').DataTable({ "ordering": false, "language": { "emptyTable": "No Record Found" } }); $('.datatable').attr('style', 'border-collapse: collapse !important');
+            $('.select2-multiple').select2({
+                theme: 'bootstrap',
+                tags: true
+            });
+            $('.select2-single').select2({
+                theme: 'bootstrap'
+            });            
+        });
+    </script>
+
+</body>
+</html>

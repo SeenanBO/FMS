@@ -1,0 +1,528 @@
+﻿
+@{
+    ViewBag.Title = "Files";
+    var WorkOrderId = ViewBag.WorkOrderId;
+    var WorkOrderNumber = ViewBag.WorkOrderNumber;
+    var BoxId = ViewBag.BoxId;
+    var BoxNumber = ViewBag.BoxNumber;
+    var FileCount = ViewBag.FileCount;
+}
+
+@section styles {
+    <link href="~/Content/jquery.Jcrop.min.css" rel="stylesheet" />
+    <style>
+        .p-t-40 {
+            padding-top: 10px !important;
+        }
+
+        .primaryButtons {
+            padding-top: 100px !important;
+        }
+
+        #finishbox {
+            background: #7abcff;
+            background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            background: -webkit-linear-gradient(top, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 );
+        }
+
+        .addfile {
+            background: #8ae29a;
+            background: -moz-linear-gradient(top, #8ae29a 2%, #6bba70 100%);
+            background: -webkit-linear-gradient(top, #8ae29a 2%,#6bba70 100%);
+            background: linear-gradient(to bottom, #8ae29a 2%,#6bba70 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8ae29a', endColorstr='#6bba70',GradientType=0 );
+        }
+
+        .barcodeReader {
+            background: linear-gradient(to bottom, #bab1ba 5%, #ededed 100%);
+            background-color: #bab1ba;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            height: 35px;
+        }
+
+        .table td {
+            padding: .25rem;
+            vertical-align: middle;
+            border-top: 1px solid #c8ced3;
+        }
+
+        .modal {
+            overflow-y: auto;
+        }
+    </style>
+}
+
+
+
+<input type="hidden" id="WorkOrderId" value="@WorkOrderId">
+<input type="hidden" id="WorkOrderNumber" value="@WorkOrderNumber">
+<input type="hidden" id="BoxId" value="@BoxId">
+<input type="hidden" id="BoxNumber" value="@BoxNumber">
+<div class="afterShowPrev" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <button style="border:1px solid #ffc107;margin: 10px 0px 10px 0px;font-weight:bold;font-size:16px;padding:10px;" type="button" class="addfile btn btn-success btn-block">Add Files</button>
+        </div>
+    </div>
+</div>
+
+<div class="primaryButtons">
+    <div class="row">
+        <div class="col-md-12">
+            <button id="finishbox" style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:18px;border:3px solid #ffc107;" type="button" class="btn btn-primary btn-lg btn-block">Finish Box</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:18px;border:3px solid #ffc107;" type="button" class="addfile btn btn-success btn-lg btn-block">Add Files</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <label style="font-weight:bold;">Files: <span class="fileCount">@FileCount</span></label>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add File</h4>
+                <button class="close FileClose" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="FileImageForm" class="form-horizontal" action="" method="post">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div id="sourceSelectPanel" style="display:none">
+                                <label for="sourceSelect">Select Camera:</label>
+                                <select id="sourceSelect" style="max-width:400px"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input class="form-control" id="file-Boxno" type="text" placeholder="Box Barcode" disabled="disabled" value="@BoxNumber">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-th-large"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input class="form-control" id="file-Barcode" type="text" placeholder="File Barcode" autofocus>
+                                <div class="input-group-append">
+                                    <button id="startButton" href="javascript:void(0)" type="button" class="input-group-text barcodeReader">
+                                        <i class="fa fa-barcode"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                Take Picture: &nbsp;<input type="file" id="addFileImage" name="FileImage" data-fileimage="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row FileImageCropButtons" style="display:none;">
+                        <h5 style="padding:0px 10px 0px 10px;">Image Cropper</h5>
+                        <div style="padding:0px 10px 10px 10px;">
+                            <button class="btn btn-secondary" id="cropbutton" type="button" style="margin-left:2px;">Crop</button>
+                            <button class="btn btn-secondary" id="rotatebutton" type="button" style="margin-left:2px;">Rotate</button>
+                            <br>
+                        </div>
+                    </div>
+                    <div class="row" id="FileImageCropBody" style='display:none;padding:0px 10px 10px 5px;'>
+
+                    </div>
+
+                    <div class="modal-footer" style="justify-content: left;">
+                        <button class="btn btn-warning FileClose" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-success FileAdded" type="submit">Add</button>
+                        <label style="font-weight:bold;margin:10px;" class="float-right;">Files: <span class="fileCount">@FileCount</span></label>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content-->
+        </div>
+        <!-- /.modal-dialog-->
+    </div>
+</div>
+
+<div class="modal fade" id="BRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Barcode Scan</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="" method="post">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div>
+                                <video id="video" width="300" height="200" style="border: 1px solid gray"></video>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+
+@section Scripts {
+    <script src="~/Scripts/jquery.Jcrop.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $(".FileImageCropButtons").hide();
+            $("#FileImageCropBody").hide();
+            if (performance.navigation.type == 2) {
+                location.reload(true);
+            }
+              $(".FileAdded").prop("disabled",true);
+
+
+        if (parseInt($(".fileCount").text()) > 0)
+            $("#finishbox").prop('disabled', false)
+        else
+            $("#finishbox").prop('disabled', true)
+
+
+          $(".FileClose").click(function () {
+            if (parseInt($(".fileCount").text()) > 0)
+                $("#finishbox").prop('disabled', false)
+            else
+                $("#finishbox").prop('disabled', true)
+        })
+
+
+        $(".addfile").click(function () {
+            $('#fileModal').modal({
+    		    backdrop: 'static',
+    		    keyboard: false
+		    });
+            $("#file-Barcode").val("");
+            $("#file-Barcode").focus();
+            $("#addFileImage").val("");
+        })
+
+
+        $("#finishbox").click(function () {
+              location.href = '@Url.Action("Boxes", "Home")?WorkOrderId='+$("#WorkOrderId").val()+'&WorkOrderNumber='+$("#WorkOrderNumber").val();
+        })
+
+
+        $("#addFileImage").change(function () {
+
+               $(".FileImageCropButtons").show();
+               $("#FileImageCropBody").show();
+               $(".FileAdded").prop("disabled",false);
+               loadImage(this);
+
+        })
+
+        $("#FileImageForm").submit(function (e) {
+            e.preventDefault();
+             var formData = new FormData();
+            var blob = dataURLtoBlob(canvas.toDataURL('image/jpeg', 0.3));
+            formData.append("FileImg", blob, "File.jpg");
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("AddFile","Home")',
+                data: {
+                    BoxId: $("#BoxId").val(), FileNumber: $("#file-Barcode").val()
+                },
+                beforeSend: function () {
+                    $("#cover-spin").show();
+                },
+                complete: function () {
+                    setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                },
+                success: function (data) {
+                    if (data == false) {
+                        $("#file-Barcode").focus();
+                        Swal.fire({
+                            title: 'File Already Exist!',
+                            text: "There is already an entry against this File Barcode #" + $("#file-Barcode").val(),
+                            icon: 'warning',
+                            timer: 3000,
+                            showCancelButton: false,
+                            showConfirmButton: false
+                        })
+                    }else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AddFileImage","Home")',
+                            processData: false,
+                            contentType: false,
+                            data: formData,
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                            },
+                            success: function (data) {
+                                if (data != null) {
+                                    swal({
+                                        title: 'File Added!',
+                                        timer: 2000,
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    })
+                                    $(".FileImageCropButtons").hide();
+                                    $("#FileImageCropBody").hide();
+                                    $("#file-Barcode").val("");
+                                    $("#file-Barcode").focus();
+                                    $("#addFileImage").val("");
+                                    $(".fileCount").text(data.FileCount);
+                                    $(".FileAdded").prop("disabled",true);
+                                }
+                            }
+                        })
+
+                    }
+
+                }
+            })
+        })
+
+    })
+
+        var crop_max_width = 330;
+        var crop_max_height = 330;
+        var jcrop_api;
+        var canvas;
+        var context;
+        var image;
+
+        var prefsize;
+
+
+        function loadImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                canvas = null;
+                reader.onload = function (e) {
+                    image = new Image();
+                    image.onload = validateImage;
+                    image.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+
+        function b64toBlob(dataURI) {
+
+            var byteString = atob(dataURI.split(',')[1]);
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: 'image/jpeg' });
+        }
+
+        function dataURLtoBlob(dataURL) {
+            var BASE64_MARKER = ';base64,';
+            if (dataURL.indexOf(BASE64_MARKER) == -1) {
+                var parts = dataURL.split(',');
+                var contentType = parts[0].split(':')[1];
+                var raw = decodeURIComponent(parts[1]);
+
+                return new Blob([raw], {
+                    type: contentType
+                });
+            }
+            var parts = dataURL.split(BASE64_MARKER);
+            var contentType = parts[0].split(':')[1];
+            var raw = window.atob(parts[1]);
+            var rawLength = raw.length;
+            var uInt8Array = new Uint8Array(rawLength);
+            for (var i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+
+            return new Blob([uInt8Array], {
+                type: contentType
+            });
+        }
+
+        function validateImage() {
+            if (canvas != null) {
+                image = new Image();
+                image.onload = restartJcrop;
+                image.src = canvas.toDataURL('image/jpeg');
+            } else restartJcrop();
+        }
+
+        function restartJcrop() {
+            if (jcrop_api != null) {
+                jcrop_api.destroy();
+            }
+            $("#FileImageCropBody").empty();
+            $("#FileImageCropBody").append("<canvas id=\"canvas\"  >");
+            canvas = $("#canvas")[0];
+            context = canvas.getContext("2d");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            context.drawImage(image, 0, 0);
+            $("#canvas").Jcrop({
+                onSelect: selectcanvas,
+                onRelease: clearcanvas,
+                boxWidth: crop_max_width,
+                boxHeight: crop_max_height
+            }, function () {
+                jcrop_api = this;
+            });
+            clearcanvas();
+        }
+
+        function clearcanvas() {
+            prefsize = {
+                x: 0,
+                y: 0,
+                w: canvas.width,
+                h: canvas.height,
+            };
+        }
+
+        function selectcanvas(coords) {
+            prefsize = {
+                x: Math.round(coords.x),
+                y: Math.round(coords.y),
+                w: Math.round(coords.w),
+                h: Math.round(coords.h)
+            };
+        }
+
+        function applyCrop() {
+            canvas.width = prefsize.w;
+            canvas.height = prefsize.h;
+            context.drawImage(image, prefsize.x, prefsize.y, prefsize.w, prefsize.h, 0, 0, canvas.width, canvas.height);
+            validateImage();
+        }
+
+        function applyRotate() {
+            canvas.width = image.height;
+            canvas.height = image.width;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(image.height / 2, image.width / 2);
+            context.rotate(Math.PI / 2);
+            context.drawImage(image, -image.width / 2, -image.height / 2);
+            validateImage();
+        }
+
+        function applyHflip() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(image.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(image, 0, 0);
+            validateImage();
+        }
+
+        function applyVflip() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(0, image.height);
+            context.scale(1, -1);
+            context.drawImage(image, 0, 0);
+            validateImage();
+        }
+
+        $("#cropbutton").click(function (e) {
+            applyCrop();
+        });
+        $("#rotatebutton").click(function (e) {
+            applyRotate();
+        });
+
+
+    </script>
+
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            let selectedDeviceId;
+            const codeReader = new BRReader.BrowserMultiFormatReader()
+            console.log('BRReader code reader initialized')
+            codeReader.getVideoInputDevices()
+                .then((videoInputDevices) => {
+                    const sourceSelect = document.getElementById('sourceSelect')
+                    selectedDeviceId = videoInputDevices[0].deviceId
+                    if (videoInputDevices.length >= 1) {
+                        videoInputDevices.forEach((element) => {
+                            const sourceOption = document.createElement('option')
+                            sourceOption.text = element.label
+                            sourceOption.value = element.deviceId
+                            sourceSelect.appendChild(sourceOption)
+                            sourceSelect.value = element.deviceId
+                            selectedDeviceId = element.deviceId
+                        })
+
+                        sourceSelect.onchange = () => {
+                            selectedDeviceId = sourceSelect.value;
+                        };
+
+                        const sourceSelectPanel = document.getElementById('sourceSelectPanel')
+                        sourceSelectPanel.style.display = 'block'
+                    }
+
+                    document.getElementById('startButton').addEventListener('click', () => {
+                        $('#BRModal').modal('toggle');
+                        codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                            if (result) {
+                                $('#file-Barcode').val(result);
+                                $('#BRModal').modal('toggle');
+                                codeReader.reset();
+                            }
+                            if (err && !(err instanceof BRReader.NotFoundException)) {
+                                alert(err);
+                                $('#BRModal').modal('toggle');
+                            }
+                        })
+                        console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+                    });
+
+                    $('#BRModal').on('hidden.bs.modal', function () {
+                        codeReader.reset()
+                    });
+
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        });
+
+    </script>
+
+}

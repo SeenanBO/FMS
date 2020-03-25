@@ -1,0 +1,1049 @@
+﻿@using FileManagementSystem.ViewModels;
+@{
+
+    WorkOrderViewModel WoList = ViewData["WoList"] as WorkOrderViewModel;
+    BoxesViewModel BoxList = ViewData["BoxList"] as BoxesViewModel;
+    FileViewModel FileList = ViewData["FileList"] as FileViewModel;
+}
+@{
+    ViewBag.Title = "Work Orders";
+}
+
+@section styles {
+    <link href="~/Content/jquery.Jcrop.min.css" rel="stylesheet" />
+    <style>
+        .p-t-40 {
+            padding-top: 10px !important;
+        }
+
+        .primaryButtons {
+            padding-top: 100px !important;
+        }
+
+        .btnactions {
+            padding: 0.175rem .25rem;
+        }
+
+        .wodetail {
+            padding: .275rem .75rem;
+        }
+
+        .boxdetail {
+            padding: .275rem .75rem;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        #prevworkorder {
+            background: #7abcff;
+            background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            background: -webkit-linear-gradient(top, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 );
+        }
+
+        .addworkorder {
+            background: #8ae29a;
+            background: -moz-linear-gradient(top, #8ae29a 2%, #6bba70 100%);
+            background: -webkit-linear-gradient(top, #8ae29a 2%,#6bba70 100%);
+            background: linear-gradient(to bottom, #8ae29a 2%,#6bba70 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8ae29a', endColorstr='#6bba70',GradientType=0 );
+        }
+
+        .modal {
+            overflow-y: auto;
+        }
+
+        .btn-secondary {
+            height: 35px;
+        }
+
+        .swal2-title {
+            font-size: 1.775em !important;
+        }
+    </style>
+
+}
+
+
+<div class="afterShowPrev" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <button style="border:1px solid black;margin:10px 0px 10px 0px;font-weight:bold;font-size:16px;padding:10px;" type="button" class="addworkorder btn btn-success btn-block">Add Work Order</button>
+        </div>
+    </div>
+</div>
+
+<div class="primaryButtons">
+    <div class="row">
+        <div class="col-md-12">
+            <button id="prevworkorder" style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:20px;border:3px solid black;" type="button" class="btn btn-primary btn-lg btn-block">Previous Work Orders</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button style="margin: 20px 0px 10px 0px;font-weight:bold;font-size:20px;border:3px solid black;" type="button" class="addworkorder btn btn-success btn-lg btn-block">Add WorkOrder</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="allPrevWorkOrders" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card ">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Work Orders</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="date" class="form-control" id="FromWoDate">
+                                </div>
+                                <div class="col-md-1 text-center">
+                                    <b style="vertical-align:middle;">To</b>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="date" class="form-control" id="ToWoDate">
+                                </div>
+                                <div class="col-md-2 com-xs-12">
+                                    <button id="WoDateFilter" class="btn-primary" style="margin-top:4px;width:100%;">Filter</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body AllWorkOrders">
+                    @if (WoList != null)
+                    {
+                        Html.Partial("_WOs", WoList);
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="viewWoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">View WorkOrder</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="email-app mb-4">
+                    <nav>
+                        <div class="form-group">
+                            <label for="nf-password">WorkOrder #</label>
+                            <input type="text" class="form-control" id="viewWo-Number" disabled="disabled" value="WorkOrderNumber">
+                        </div>
+                    </nav>
+                    <main class="WoImgInWo">
+                        <img id="viewWo-Image" src="" style="width: 350px;height: 340px; margin: 0 auto;" />
+                    </main>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+
+<div class="modal fade" id="viewboxModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">View Box</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="email-app mb-4">
+                    <nav>
+                        <div class="form-group">
+                            <label for="nf-password">Box Barcode</label>
+                            <input type="text" class="form-control" id="viewbox-Barcode" disabled="disabled" value="Box Barcode">
+                        </div>
+                    </nav>
+                    <main class="BoxInWo">
+                        <img id="viewbox-Image" src="" style="width: 350px;height: 340px; margin: 0 auto;" />
+                    </main>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<div class="modal fade" id="woeditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Work Order Number</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="EditWoNumber" value="">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <input type="hidden" class="woId" value="">
+                <input type="hidden" class="woNumber" value="">
+                <button class="btn btn-primary woNumberUpdate" type="button" data-dismiss="modal">Update</button>
+                <button class="btn btn-warning" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal-content-->
+</div>
+
+<div class="modal fade" id="viewfileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">View File</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="email-app mb-4">
+                    <nav>
+                        <div class="form-group">
+                            <label for="nf-password">File Barcode</label>
+                            <input type="text" class="form-control" id="viewfile-Barcode" disabled="disabled" value="">
+                        </div>
+                    </nav>
+                    <main class="FileInbox">
+                        <img id="viewfile-Image" src="" style="width: 350px;height: 340px; margin: 0 auto;" />
+                    </main>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<div class="modal fade" id="wodetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Boxes In Work Order #<span class="wodetailwono"></span></h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="allPrevBoxes">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body" id="woBoxes">
+                                    @if (BoxList != null)
+                                    {
+                                        Html.Partial("_WoDetail", BoxList);
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+
+<div class="modal fade" id="boxdetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Files in Box #<span class="boxdetailboxno"></span></h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="allPrevFiles">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body" id="BoxFiles">
+                                    @if (FileList != null)
+                                    {
+                                        Html.Partial("_BoxDetail", FileList);
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+
+
+<div class="modal fade" id="viewWoImageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-primary" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add WorkOrder Picture</h4>
+                <button class="close WoImgNotAdded" data-workorderid="" data-workordernumber="" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="WoImageForm" class="form-horizontal" action="" method="post">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                Take Picture: &nbsp; <input type="file" id="addWoImage" name="WoImage" data-woimage="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row WoImageCropButtons" style="display:none;">
+                        <h5 style="padding:0px 10px 0px 10px;">Image Cropper</h5>
+                        <div style="padding:0px 10px 10px 10px;">
+                            <button class="btn btn-secondary" id="cropbutton" type="button" style="margin-left:2px;">Crop</button>
+                            <button class="btn btn-secondary" id="rotatebutton" type="button" style="margin-left:2px;">Rotate</button>
+                            <br>
+                        </div>
+                    </div>
+                    <div class="row" id="WoImageCropBody" style='display:none;padding:0px 10px 10px 5px;'>
+
+                    </div>
+                    <div class="modal-footer" style="justify-content: left;">
+                        <button class="btn btn-warning WoImgNotAdded" data-workorderid="" data-workordernumber="" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-success WoImgAdded" type="submit">Add</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+
+
+<div id="submitModal" class="multi-step">
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/jquery.Jcrop.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".WoImageCropButtons").hide();
+            $("#WoImageCropBody").hide();
+            $(".WoImgAdded").prop("disabled", true);
+
+            if (performance.navigation.type == 2) {
+                location.reload(true);
+            }
+
+            $("#prevworkorder").click(function () {
+                $(".afterShowPrev").fadeIn();
+                $(".primaryButtons").hide();
+                $(".allPrevWorkOrders").show();
+                var from = $("#FromWoDate").val();
+                var to = $("#ToWoDate").val();
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("FilterWorkOrders","Home")',
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                    },
+                    data: {
+                        From: from, To: to
+                    },
+                    success: function (data) {
+                        $(".AllWorkOrders").html(data);
+                        $('.WOs').DataTable({ "ordering": false, "language": { "emptyTable": "No Record Found" } }); $('.datatable').attr('style', 'border-collapse: collapse !important');
+                        $('.select2-multiple').select2({
+                            theme: 'bootstrap',
+                            tags: true
+                        });
+                        $('.select2-single').select2({
+                            theme: 'bootstrap'
+                        });
+                    }
+                })
+
+            })
+
+            $("#WoDateFilter").click(function () {
+                $("#prevworkorder").trigger("click");
+            })
+
+            $(document).on('click', '.woedit', function () {
+                $("#woeditModal .woId").val($(this).data("workorderid"));
+                $("#woeditModal .woNumber").val($(this).data("workordernumber"));
+                $('#woeditModal').modal('show');
+                $("#EditWoNumber").val($(this).data("workordernumber"));
+            })
+
+            $(document).on('click', '.woNumberUpdate', function () {
+                if ($("#EditWoNumber").val() != "") {
+                    var workorderid = parseInt($("#woeditModal .woId").val());
+                    var workordernumber = $("#EditWoNumber").val();
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("UpdateWoNumber","Home")',
+                        beforeSend: function () {
+                            $("#cover-spin").show();
+                        },
+                        complete: function () {
+                            setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                        },
+                        data: {
+                            WorkOrderId: workorderid, WorkOrderNumber: workordernumber
+                        },
+                        success: function (data) {
+                            if (data)
+                                $("#prevworkorder").trigger("click");
+                            else
+                                alert("Something Wernt Wrong!")
+                        }
+                    })
+                }
+            })
+
+            $(document).on('click', '.addworkorder', function () {
+
+                Swal.mixin({
+                    confirmButtonText: 'Next &rarr;',
+                    showCancelButton: true,
+                    progressSteps: ['1', '2'],
+                    input: 'number',
+                    inputAttributes: {
+                        pattern: "\d*",
+                      },
+                }).queue([
+                    'Enter WorkOrder #',
+                    'Re-enter WorkOrder #'
+                ]).then((result) => {
+                    if (result.value) {
+                        const entries = json2array(result.value);
+                        if (entries[1] == "" && entries[2] == "") {
+                            Swal.fire({
+                                title: 'Invalid work order #',
+                                text: 'Please try again'
+                            });
+                        }
+                        else if (entries[1] != entries[2]) {
+                            Swal.fire({
+                                title: 'No Match of inputs',
+                                text: 'Please try again'
+                            });
+                        } else if (entries[0] == entries[2]) {
+                            Swal.fire({
+                                title: 'Already Exist!',
+                                text: "There is already an entry against this work order #",
+                                icon: 'warning',
+                                confirmButtonColor: 'd33',
+                            })
+                        } else if (entries[0] != entries[2]) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("AddWorkOrder","Home")',
+                                beforeSend: function () {
+                                    $("#cover-spin").show();
+                                },
+                                complete: function () {
+                                    setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                                },
+                                data: {
+                                    WorkOrderNumber: entries[2]
+                                },
+                                success: function (data) {
+                                    if (data != null) {
+                                        swal({
+                                            title: 'WorkOrder Added!',
+                                            timer: 2000,
+                                            showCancelButton: false,
+                                            showConfirmButton: false
+                                        })
+                                        $(".WoImgNotAdded").data("workorderid", data.WorkOrderId);
+                                        $(".WoImgNotAdded").data("workordernumber", data.WorkOrderNumber);
+                                        setTimeout(function () {
+                                            $('#viewWoImageModal').modal({
+                                                backdrop: 'static',
+                                                keyboard: false
+                                            });
+                                        }, 1000);
+
+                                    }
+                                    else
+                                        alert("Something Went Wrong Try Again")
+                                }
+                            })
+                        }
+
+                    }
+                })
+
+            });
+
+            $(document).on('click', '.WoImgNotAdded', function () {
+                location.href = '@Url.Action("Boxes", "Home")?WorkOrderId='+$(this).data("workorderid")+'&WorkOrderNumber='+$(this).data("workordernumber");
+            })
+
+
+            $(document).on('click', '.wodetail', function () {
+                var workorderid = $(this).data("workorderid");
+                var workordernumber = $(this).data("workordernumber");
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("WorkOrderDetail","Home")',
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                    },
+                    data: {
+                        WorkOrderId: workorderid
+                    },
+                    success: function (data) {
+                        $('.wodetailwono').text(workordernumber);
+                        $('#woBoxes').html(data);
+                        $('#wodetailModal').modal('show');
+                        $('.wodetailDatatable').DataTable({ "ordering": false, "language": { "emptyTable": "No Record Found" } }); $('.datatable').attr('style', 'border-collapse: collapse !important');
+                        $('.select2-multiple').select2({
+                            theme: 'bootstrap',
+                            tags: true
+                        });
+                        $('.select2-single').select2({
+                            theme: 'bootstrap'
+                        });
+                    }
+                })
+            })
+
+            $(document).on('click', '.boxdetail', function () {
+                var boxid = $(this).data("boxid");
+                var boxbarcode = $(this).data("boxbarcode");
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("BoxDetail","Home")',
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                    },
+                    data: {
+                        boxId: boxid
+                    },
+                    success: function (data) {
+                        $('.boxdetailboxno').text(boxbarcode);
+                        $('#BoxFiles').html(data);
+                        $('#wodetailModal').modal('hide');
+                        $('#boxdetailModal').modal('show');
+                        $('.boxdetailDatatable').DataTable({ "ordering": false, "language": { "emptyTable": "No Record Found" } }); $('.datatable').attr('style', 'border-collapse: collapse !important');
+                        $('.select2-multiple').select2({
+                            theme: 'bootstrap',
+                            tags: true
+                        });
+                        $('.select2-single').select2({
+                            theme: 'bootstrap'
+                        });
+                    }
+                })
+            })
+
+            $(document).on('click', '.wodelete', function () {
+                var workorderid = $(this).data("workorderid");
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Delete WorkOrder!'
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("DeleteWorkOrder","Home")',
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                            },
+                            data: {
+                                WorkOrderId: workorderid
+                            },
+                            success: function (data) {
+                                if (data != false) {
+                                    Swal.fire({
+                                        title: 'Work Order Deleted!',
+                                        showCancelButton: false,
+                                        showConfirmButton: false,
+                                        timer:2000
+                                    })
+                                    setTimeout(function () {
+                                        location.reload(true);
+                                    }, 1000);
+                                }
+                                else
+                                    alert("Something Went Wrong Try Again")
+                            }
+                        })
+                    }
+                })
+
+            })
+
+            $(document).on('click', '.boxdelete', function () {
+                var boxid = $(this).data("boxid");
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Delete Box!'
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("DeleteBox","Home")',
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                            },
+                            data: {
+                                BoxId: boxid
+                            },
+                            success: function (data) {
+                                if (data != false) {
+                                     Swal.fire({
+                                        title: 'Box Deleted!',
+                                        showCancelButton: false,
+                                        showConfirmButton: false,
+                                        timer:2000
+                                    })
+                                    setTimeout(function () {
+                                        location.reload(true);
+                                    }, 1000);
+                                }
+                                else
+                                    alert("Something Went Wrong Try Again")
+                            }
+                        })
+                    }
+                })
+            })
+
+            $(document).on('click', '.filedelete', function () {
+                var fileid = $(this).data("fileid");
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Delete File!'
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("DeleteFile","Home")',
+                            beforeSend: function () {
+                                $("#cover-spin").show();
+                            },
+                            complete: function () {
+                                setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                            },
+                            data: {
+                                FileId: fileid
+                            },
+                            success: function (data) {
+                                if (data != false) {
+                                    Swal.fire({
+                                        title: 'File Deleted!',
+                                        showCancelButton: false,
+                                        showConfirmButton: false,
+                                        timer:2000
+                                    })
+                                    setTimeout(function () {
+                                        location.reload(true);
+                                    }, 1000);
+                                }
+                                else
+                                    alert("Something Went Wrong Try Again")
+                            }
+                        })
+                    }
+                })
+            })
+
+            $(document).on('click', '.btnwoimg', function () {
+                var workorderid = $(this).data("workorderid");
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetWorkOrderImage","Home")',
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                    },
+                    data: {
+                        WorkOrderId: workorderid,
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            $("#viewWo-Number").val(data.WorkOrderNumber);
+                            if (data.ImgPath != null)
+                                $("#viewWo-Image").attr("src", data.ImgPath);
+                            else
+                                $("#viewWo-Image").attr("src", "/Content/Images/No_Image_Available.jpg");
+                        }
+                        $('#viewWoModal').modal('show');
+
+                    }
+                })
+            })
+
+            $(document).on('click', '.btnboximg', function () {
+                var Boxid = $(this).data("boxid");
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetBoxImage","Home")',
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                    },
+                    data: {
+                        BoxId: Boxid,
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                             if (data.ImgPath != null)
+                                 $("#viewbox-Barcode").val(data.BoxBarcode);
+                            else
+                                $("#viewbox-Barcode").val("N/A");
+
+                            if (data.ImgPath != null)
+                                $("#viewbox-Image").attr("src", data.ImgPath);
+                            else
+                                $("#viewbox-Image").attr("src", "/Content/Images/No_Image_Available.jpg");
+                        }
+                        $('#wodetailModal').modal('hide');
+                        $('#viewboxModal').modal('show');
+
+                    }
+                })
+            })
+
+            $(document).on('click', '.btnfileimg', function () {
+                var fileid = $(this).data("fileid");
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetFileImage","Home")',
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 600);
+                    },
+                    data: {
+                        FileId: fileid,
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                              if (data.FileBarcode != null)
+                                $("#viewfile-Barcode").val(data.FileBarcode);
+                            else
+                                $("#viewfile-Barcode").val("N/A");
+
+                            if (data.ImgPath != null)
+                                $("#viewfile-Image").attr("src", data.ImgPath);
+                            else
+                                $("#viewfile-Image").attr("src", "/Content/Images/No_Image_Available.jpg");
+                        }
+                        $('#boxdetailModal').modal('hide');
+                        $('#viewfileModal').modal('show');
+
+                    }
+                })
+            })
+
+            $("#addWoImage").change(function () {
+                $(".WoImageCropButtons").show();
+                $("#WoImageCropBody").show();
+                $(".WoImgAdded").prop("disabled",false);
+                loadImage(this);
+            })
+
+            $("#WoImageForm").submit(function (e) {
+                e.preventDefault();
+
+                var formData = new FormData();
+                var blob = dataURLtoBlob(canvas.toDataURL('image/jpeg', 0.1));
+                console.log(blob.size);
+                formData.append("WorkOrderImg", blob ,"WorkOrder.jpg");
+
+                $.ajax({
+                    url: '@Url.Action("AddWorkorderImage","Home")',
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $("#cover-spin").show();
+                    },
+                    complete: function () {
+                        setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                    },
+                    success: function (data) {
+                        if (data != false) {
+                            Swal.fire({
+                                title: 'Work Order Image Added!',
+                                showCancelButton: false,
+                                showConfirmButton: false,
+                                timer:2000
+                            })
+                            setTimeout(function () {
+                                    location.href = '@Url.Action("Boxes","Home")?WorkOrderId='+data.WorkOrderId+'&WorkOrderNumber='+data.WorkOrderNumber;
+                            }, 1000);
+                        } else
+                            alert("Something Went Wrong!")
+
+                    }
+                });
+            });
+
+        });
+
+
+        function json2array(json) {
+            var result = [];
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CheckWorkOrder","Home")',
+                async: false,
+                data: {
+                    WorkOrderNumber: json[1]
+                },
+                success: function (data) {
+                    result.push(data)
+                    result.push(json[0], json[1]);
+
+                }
+            })
+            return result;
+        };
+
+        var crop_max_width = 330;
+        var crop_max_height = 330;
+        var jcrop_api;
+        var canvas;
+        var context;
+        var image;
+
+        var prefsize;
+
+
+        function loadImage(input) {
+            if (input.files && input.files[0]) {
+                console.log(input.files[0].size);
+                var reader = new FileReader();
+                canvas = null;
+                reader.onload = function (e) {
+                    image = new Image();
+                    image.onload = validateImage;
+                    image.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function b64toBlob(dataURI) {
+
+            var byteString = atob(dataURI.split(',')[1]);
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: 'image/jpeg' });
+        }
+
+        function dataURLtoBlob(dataURL) {
+            var BASE64_MARKER = ';base64,';
+            if (dataURL.indexOf(BASE64_MARKER) == -1) {
+                var parts = dataURL.split(',');
+                var contentType = parts[0].split(':')[1];
+                var raw = decodeURIComponent(parts[1]);
+
+                return new Blob([raw], {
+                    type: contentType
+                });
+            }
+            var parts = dataURL.split(BASE64_MARKER);
+            var contentType = parts[0].split(':')[1];
+            var raw = window.atob(parts[1]);
+            var rawLength = raw.length;
+            var uInt8Array = new Uint8Array(rawLength);
+            for (var i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+
+            return new Blob([uInt8Array], {
+                type: contentType
+            });
+        }
+
+        function validateImage() {
+            if (canvas != null) {
+                image = new Image();
+                image.onload = restartJcrop;
+                image.src = canvas.toDataURL('image/jpeg');
+            } else restartJcrop();
+        }
+
+        function restartJcrop() {
+            if (jcrop_api != null) {
+                jcrop_api.destroy();
+            }
+            $("#WoImageCropBody").empty();
+            $("#WoImageCropBody").append("<canvas id=\"canvas\"  >");
+            canvas = $("#canvas")[0];
+            context = canvas.getContext("2d");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            context.drawImage(image, 0, 0);
+            $("#canvas").Jcrop({
+                onSelect: selectcanvas,
+                onRelease: clearcanvas,
+                boxWidth: crop_max_width,
+                boxHeight: crop_max_height
+            }, function () {
+                jcrop_api = this;
+            });
+            clearcanvas();
+        }
+
+        function clearcanvas() {
+            prefsize = {
+                x: 0,
+                y: 0,
+                w: canvas.width,
+                h: canvas.height,
+            };
+        }
+
+        function selectcanvas(coords) {
+            prefsize = {
+                x: Math.round(coords.x),
+                y: Math.round(coords.y),
+                w: Math.round(coords.w),
+                h: Math.round(coords.h)
+            };
+        }
+
+        function applyCrop() {
+            canvas.width = prefsize.w;
+            canvas.height = prefsize.h;
+            context.drawImage(image, prefsize.x, prefsize.y, prefsize.w, prefsize.h, 0, 0, canvas.width, canvas.height);
+            validateImage();
+        }
+
+        function applyRotate() {
+            canvas.width = image.height;
+            canvas.height = image.width;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(image.height / 2, image.width / 2);
+            context.rotate(Math.PI / 2);
+            context.drawImage(image, -image.width / 2, -image.height / 2);
+            validateImage();
+        }
+
+        function applyHflip() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(image.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(image, 0, 0);
+            validateImage();
+        }
+
+        function applyVflip() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(0, image.height);
+            context.scale(1, -1);
+            context.drawImage(image, 0, 0);
+            validateImage();
+        }
+
+        $("#cropbutton").click(function (e) {
+            applyCrop();
+        });
+        $("#rotatebutton").click(function (e) {
+            applyRotate();
+        });
+
+
+    </script>
+}

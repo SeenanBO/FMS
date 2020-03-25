@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "WorkOrderDataEntry";
+    var WoDetail = ViewBag.Boxes;
+    var WorkOrderId = ViewBag.WorkOrderId;
+    string WorkOrderNumber = ViewBag.WorkOrderNumber;
+    var WorkOrder = ViewBag.WorkOrder;
+}
+
+@section styles {
+    <style>
+        .p-t-40 {
+            padding-top: 30px !important;
+        }
+
+        .table td {
+            padding: .45rem;
+            vertical-align: middle;
+            border-top: 1px solid #c8ced3;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .swal2-title {
+            font-size: 1.275em !important;
+        }
+    </style>
+}
+
+
+<input type="hidden" id="WorkOrderId" value="@WorkOrderId">
+<input type="hidden" id="OpenedWorkOrderNumber" value="@WorkOrderNumber">
+
+<div class="row">
+
+    <div class="col-md-3 offset-md-3">
+        <div class="form-group ">
+            <label for="usr">WorkOrder Number:</label>
+            <input type="number" class="form-control" id="WorkOrderNumber" tabindex="1" placeholder="Enter WorkOrder#" autofocus>
+        </div>
+
+    </div>
+    <div class="col-md-5 ">
+        <div class="ImageWrapper">
+            @if (WorkOrder != null)
+            {
+                if (WorkOrder.ImgPath != "")
+                {
+                    <img src="@WorkOrder.ImgPath" style="width:300px">
+                }
+                else
+                {
+                    <img src="/Content/Images/No_Image_Available.jpg" style="width:300px">
+                }
+            }
+            else
+            {
+                <img src="/Content/Images/No_Image_Available.jpg" style="width:300px">
+            }
+        </div>
+    </div>
+</div>
+<br>
+<br>
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <button class="btn btn-primary btn-lg SaveWorkOrder" tabindex="2">Next Step</button>
+    </div>
+</div>
+<br>
+
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+        localStorage.clear();
+        if (performance.navigation.type == 2) {
+            location.reload(true);
+        }
+
+        $(document).keydown(function (e) {
+            if (e.keyCode === 13) {
+                $(".SaveWorkOrder").trigger("click")
+            }
+        });
+
+        var Checked = false;
+        $(".SaveWorkOrder").click(function () {
+            if ($("#WorkOrderNumber").val() != "") {
+                if ($("#WorkOrderNumber").val() == $("#OpenedWorkOrderNumber").val() || Checked == true) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("SaveWorkOrderDataEntry","Home")',
+                        data: { WorkOrderId: parseInt($("#WorkOrderId").val()), WorkOrderNumber: $("#WorkOrderNumber").val() },
+                        beforeSend: function () {
+                            $("#cover-spin").show();
+                        },
+                        complete: function () {
+                            setTimeout(function () { $("#cover-spin").hide(); }, 1000);
+                        },
+                        success: function (data) {
+                            if (data != false) {
+                                Swal.fire({
+                                    title: 'WorkOrder Saved!',
+                                    timer: 3000,
+                                    showCancelButton: false,
+                                    showConfirmButton: false
+                                })
+                                Checked = false;
+                                setTimeout(function () {
+                                    location.href = '@Url.Action("BoxDataEntry","Home")?Number=0&WorkOrderId=' + parseInt($("#WorkOrderId").val()) + '&WorkOrderNumber=' + $("#WorkOrderNumber").val();
+                                }, 1000);
+                            }
+                            else
+                                alert("Something Went Wrong!")
+
+                        }
+                    })
+                } else {
+                    Checked = true;
+                    $("#WorkOrderNumber").focus();
+                     Swal.fire({
+                        title: 'Does Not Match The Initial Entry!',
+                        icon: 'warning',
+                        timer: 3000,
+                        showCancelButton: false,
+                        showConfirmButton: false
+                     })
+                }
+            } else {
+                $("#WorkOrderNumber").focus();
+                $("#WorkOrderNumber").css("border", "1px solid red")
+            }
+
+        })
+
+    })
+    </script>
+}
+
+
